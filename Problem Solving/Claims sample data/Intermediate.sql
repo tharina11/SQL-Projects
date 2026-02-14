@@ -16,4 +16,16 @@ HAVING AVG(claim_amount) >
 	 FROM claims)
 ;
 
---
+-- Members with more than 1 visit
+SELECT member_id,
+	COUNT(visit_id) AS visit_count
+FROM visits
+GROUP By member_id
+HAVING COUNT(visit_id) > 1;
+
+-- Claims in last 36 months
+SELECT claim_id,
+claim_date
+FROM claims
+WHERE claim_date > (SELECT CURRENT_DATE - INTERVAL '33 months');
+
