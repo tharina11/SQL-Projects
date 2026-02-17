@@ -1,4 +1,4 @@
-/*2. Basic Time Aggregation */
+/*1. Basic Time Aggregation */
 -- Return total claim amount per month
 SELECT 
 	DATE_TRUNC('month', claim_date) AS claim_month,
@@ -94,3 +94,32 @@ SELECT
     ) AS pct_of_month
 FROM monthly_totals
 ORDER BY month, status;
+
+
+--/*3. Running Totals and Cumulative Metrics */
+-- Calculate cumulative claim amount over months.
+WITH CTE AS
+(
+SELECT 
+DATE_TRUNC('month', claim_date) AS claim_month,
+SUM(claim_amount) AS month_sum
+FROM public.claims_activity
+GROUP BY DATE_TRUNC('month', claim_date)
+ORDER BY claim_month
+)
+SELECT 
+	claim_month,
+	month_sum,
+SUM(month_sum) OVER(ORDER BY claim_month) AS cumulative_monthly_sum
+FROM CTE;
+
+
+-- Cumulative claim amount per member ordered by claim_date.
+SELECT 
+member_id,
+claim_id,
+claim_date,
+claim_amount,
+SUM(claim_amount) OVER(PARTITION BY member_id ORDER BY claim_date) AS cumulative_member_sum
+FROM public.claims_activity
+ORDER BY member_id, claim_date
