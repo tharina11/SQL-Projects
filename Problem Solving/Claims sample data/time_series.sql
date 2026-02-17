@@ -101,8 +101,8 @@ ORDER BY month, status;
 WITH CTE AS
 (
 SELECT 
-DATE_TRUNC('month', claim_date) AS claim_month,
-SUM(claim_amount) AS month_sum
+	DATE_TRUNC('month', claim_date) AS claim_month,
+	SUM(claim_amount) AS month_sum
 FROM public.claims_activity
 GROUP BY DATE_TRUNC('month', claim_date)
 ORDER BY claim_month
@@ -119,13 +119,13 @@ SELECT
 	month_sum,
 SUM(month_sum) OVER(ORDER BY claim_month) AS cumulative_monthly_sum
 FROM (
-SELECT 
-DATE_TRUNC('month', claim_date) AS claim_month,
-SUM(claim_amount) AS month_sum
-FROM public.claims_activity
-GROUP BY DATE_TRUNC('month', claim_date)
-ORDER BY claim_month
-) AS t1;
+	SELECT 
+		DATE_TRUNC('month', claim_date) AS claim_month,
+		SUM(claim_amount) AS month_sum
+	FROM public.claims_activity
+	GROUP BY DATE_TRUNC('month', claim_date)
+	ORDER BY claim_month
+	) AS t1;
 ---
 
 -- Cumulative claim amount per member ordered by claim_date.
