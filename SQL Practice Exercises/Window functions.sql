@@ -65,3 +65,23 @@ SELECT
 FROM purchase p
 JOIN department d
 ON d.id = p.department_id
+
+
+-- ## PARTITION BY ## --
+-- Number of journeys per date
+SELECT 
+  id, 
+  date,
+  COUNT(route_id) OVER(PARTITION BY date)
+FROM journey
+
+-- Fiter and count with PARTITION BY
+SELECT
+  id, 
+  model,
+  first_class_places, 
+  second_class_places,
+  COUNT(id) OVER(PARTITION BY model)
+FROM train
+WHERE first_class_places > 30 
+  AND second_class_places > 180
