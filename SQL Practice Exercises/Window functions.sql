@@ -85,3 +85,14 @@ SELECT
 FROM train
 WHERE first_class_places > 30 
   AND second_class_places > 180
+  
+-- PARTITION BY multiple columns
+SELECT 
+  journey.id,
+  date,
+  model,
+  max_speed,
+  MAX(max_speed) OVER(PARTITION BY route_id, date)
+FROM journey
+JOIN train
+ON train.id = journey.train_id
