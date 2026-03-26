@@ -77,3 +77,46 @@ SELECT
   total_price,
   SUM(total_price) OVER(ORDER BY placed RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
 FROM single_order
+
+-- Default window frame without ORDER BY
+SELECT 
+  id,
+  placed,
+  total_price,
+  SUM(total_price) OVER()
+FROM single_order
+
+-- Default window frame with ORDER BY (this assumes ROWS UNBOUNDED PRECEDING)
+SELECT 
+  id,
+  placed,
+  total_price,
+  SUM(total_price) OVER(ORDER BY placed)
+FROM single_order
+
+-- Quiz 1
+SELECT
+  department_id,
+  year,
+  amount,
+  SUM(amount) OVER(ORDER BY year ROWS 2 PRECEDING)
+FROM revenue
+WHERE department_id = 2
+
+-- Quiz 2
+SELECT
+  department_id,
+  year,
+  amount,
+  AVG(amount) OVER(ORDER BY year ROWS UNBOUNDED PRECEDING)
+FROM revenue
+WHERE department_id = 1
+
+-- Quiz 3
+SELECT
+  department_id,
+  year,
+  amount,
+  AVG(amount) OVER(ORDER BY year RANGE CURRENT ROW),
+  amount - AVG(amount) OVER(ORDER BY year RANGE CURRENT ROW)
+FROM revenue
