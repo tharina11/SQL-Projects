@@ -75,3 +75,123 @@ SELECT
 FROM statistics
 WHERE website_id= 1
   AND day BETWEEN '2016-05-15' AND '2016-05-31';
+  
+ -- FIRST_VALUE() example
+ SELECT
+  day,
+  users,
+  FIRST_VALUE(users) OVER(ORDER BY users)
+FROM statistics
+ WHERE website_id = 2;
+ 
+ -- FIRST_VALUE() example 2
+ SELECT
+  day,
+  revenue,
+  FIRST_VALUE(revenue) OVER(ORDER BY day)
+FROM statistics
+ WHERE website_id = 3;
+ 
+ -- LAST_VALUE() example. Simply LAST_VALUE(..) OVER(ORDER BY) does not work
+ -- This assumes RANGE UNBOUNDED PRECEDING
+ SELECT
+  name,
+  opened,
+  LAST_VALUE(opened) OVER(
+    ORDER BY opened
+    ROWS BETWEEN UNBOUNDED PRECEDING
+      AND UNBOUNDED FOLLOWING)
+FROM website;
+
+-- LAST_VALUE() example 2
+SELECT
+  day,
+  impressions,
+  LAST_VALUE(impressions) OVER(
+  							ORDER BY users 
+  							ROWS BETWEEN UNBOUNDED PRECEDING
+  							AND UNBOUNDED FOLLOWING)
+FROM statistics
+WHERE website_id = 1
+
+-- LAST_VALUE() example 3
+SELECT
+  day,
+  users,
+  LAST_VALUE(users) OVER(
+  						ORDER BY day 
+  						ROWS BETWEEN UNBOUNDED PRECEDING
+  						AND UNBOUNDED FOLLOWING),
+  users - LAST_VALUE(users) OVER(
+  						ORDER BY day 
+  						ROWS BETWEEN UNBOUNDED PRECEDING
+  						AND UNBOUNDED FOLLOWING)
+FROM statistics
+WHERE website_id = 1
+
+-- Third highest value using NTH_VALUE()
+SELECT
+  day,
+  revenue,
+  NTH_VALUE(revenue, 3) OVER(
+    ORDER BY revenue DESC 
+    ROWS BETWEEN UNBOUNDED PRECEDING
+      AND UNBOUNDED FOLLOWING)
+  FROM statistics
+WHERE website_id= 2
+  AND day BETWEEN '2016-05-15' AND '2016-05-31';
+  
+-- Practice exercise 1
+SELECT
+  website_id,
+  revenue,
+  FIRST_VALUE(revenue) OVER(ORDER BY revenue DESC) AS highest_revenue,
+  LAST_VALUE(revenue) OVER(ORDER BY revenue DESC 
+   ROWS BETWEEN UNBOUNDED PRECEDING
+      AND UNBOUNDED FOLLOWING) AS lowest_revenue
+  FROM statistics
+  WHERE day = '2016-05-14';
+  
+  
+  -- Meadian value of the month
+  SELECT
+  day,
+  clicks,
+  NTH_VALUE(clicks, 16) OVER(ORDER BY clicks DESC 
+   ROWS BETWEEN UNBOUNDED PRECEDING
+      AND UNBOUNDED FOLLOWING)
+  FROM statistics
+WHERE website_id = 1;
+
+-- ratio calculation with FIRST_VALUE
+SELECT
+  day,
+  clicks,
+  ROUND((clicks / FIRST_VALUE(clicks) OVER(
+    ORDER BY clicks DESC)::numeric) * 100)
+FROM statistics
+WHERE website_id = 3;
+
+
+-- Quiz exercise 1
+SELECT 
+  day,
+  price,
+  LEAD(price) OVER()
+FROM advertisement
+
+-- Quiz exercise 2
+SELECT 
+  day,
+  price,
+  LAG(price, 7) OVER(),
+  price - LAG(price, 7) OVER()
+FROM advertisement
+
+-- Quiz exercise 3
+SELECT 
+  day,
+  price,
+  FIRST_VALUE(price) OVER(ORDER BY price DESC) AS highest_price,
+  FIRST_VALUE(price) OVER(ORDER BY price) AS lowest_price
+FROM advertisement
