@@ -62,4 +62,57 @@ FROM country
 WHERE population < (
   SELECT min(population)
   FROM city
-  WHERE country.id = city.country_id)
+  WHERE country.id = city.country_id);
+  
+-- Correlated subquery with Alias
+SELECT
+  *
+FROM city main_city
+WHERE rating > (
+  SELECT
+    AVG(rating)
+  FROM city avg_city
+  WHERE main_city.country_id = avg_city.country_id);
+  
+-- Subquery with IN
+SELECT *
+FROM trip
+WHERE city_id IN (
+  SELECT id
+  FROM city
+  WHERE rating < 4);
+  
+-- Subquery with EXISTS
+SELECT *
+FROM country
+WHERE EXISTS (
+  SELECT country_id
+  FROM mountain
+  WHERE country_id = mountain.country_id)
+  
+-- Subquery with NOT EXISTS
+SELECT *
+FROM mountain
+WHERE NOT EXISTS(
+  SELECT mountain_id
+  FROM hiking_trip
+  WHERE hiking_trip.mountain_id = mountain.id
+);
+
+-- Subquery with ALL
+SELECT *
+FROM hiking_trip main_trip
+WHERE length >= ALL (
+  SELECT length
+  FROM hiking_trip sub_trip
+  WHERE main_trip.mountain_id = sub_trip.mountain_id
+);
+
+-- Trips those last shorter than any hiking trip with the same price
+SELECT *
+FROM trip
+WHERE days < ANY (
+  SELECT days 
+  FROM hiking_trip
+  WHERE trip.price = hiking_trip.price
+);
