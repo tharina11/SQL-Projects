@@ -116,3 +116,34 @@ WHERE days < ANY (
   FROM hiking_trip
   WHERE trip.price = hiking_trip.price
 );
+
+-- Subquery in FROM clause 1
+SELECT *
+FROM mountain, (
+  SELECT *
+  FROM country
+  WHERE population >= 50000
+  ) AS large_country
+WHERE mountain.country_id = large_country.id
+;
+
+-- Subquery in FROM clause 2
+SELECT 
+  length,
+  height
+FROM hiking_trip, (
+  SELECT *
+  FROM mountain
+  WHERE height >= 3000
+  ) AS tall_mountains
+WHERE tall_mountains.id = hiking_trip.mountain_id
+;
+
+-- Subquery in SELECT clause
+SELECT 
+  name,
+	(SELECT COUNT(*)
+	  FROM hiking_trip
+	  WHERE hiking_trip.mountain_id = mountain.id) AS count
+FROM mountain
+;
