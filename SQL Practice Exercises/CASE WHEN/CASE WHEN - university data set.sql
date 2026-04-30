@@ -211,3 +211,48 @@ GROUP BY CASE
     WHEN score_language >= 40 THEN 'average score'
     ELSE 'poor score'
 END;
+
+-- ## Summary ##
+-- Example 1
+SELECT
+  name,
+  CASE 
+    WHEN graduate_satisfaction > 80 THEN 'satisfied' 
+    WHEN graduate_satisfaction > 50 THEN 'moderately satisfied'
+    WHEN graduate_satisfaction <= 50 THEN 'not satisfied'
+    END AS satisfaction_level
+FROM course;
+
+-- Example 2
+SELECT
+  SUM(CASE WHEN score_math >= 60 AND score_language >= 60 THEN 1 ELSE 0 END) 
+    AS versatile_candidates,
+  SUM(CASE WHEN score_math < 40 AND score_language < 40 THEN 1 ELSE 0 END) 
+    AS poor_candidates
+FROM candidate
+WHERE preferred_contact IS NOT NULL
+;
+
+-- Example 3
+SELECT
+  name,
+  CASE
+    WHEN COUNT(DISTINCT candidate_id) > 5 THEN 'high'
+    ELSE 'low' END AS popularity
+FROM course
+JOIN application
+  ON course.id = application.course_id
+GROUP BY name;
+
+-- Example 4
+SELECT
+  name,
+  place_limit,
+  COUNT(DISTINCT candidate_id) AS candidates_no,
+  CASE
+   WHEN COUNT(DISTINCT candidate_id) > place_limit THEN 'overcrowded'
+   ELSE 'within limit' END AS popularity
+FROM course
+JOIN application
+  ON course.id = application.course_id
+GROUP BY name, place_limit;
