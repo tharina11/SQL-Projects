@@ -140,3 +140,74 @@ SELECT
   COUNT(CASE WHEN scholarship = 't' THEN scholarship END) AS scholarship_present,
   COUNT(CASE WHEN scholarship = 'f' THEN scholarship END) AS scholarship_missing
 FROM course;
+
+-- Example 5
+SELECT
+  COUNT(CASE WHEN score_math >= 80 THEN id END) AS good_math,
+  COUNT(CASE WHEN score_math < 80 AND score_math >= 60 THEN id END) AS average_math,
+  COUNT(CASE WHEN score_math < 60 THEN id END) AS poor_math
+FROM candidate
+WHERE preferred_contact IS NOT NULL;
+
+-- Example 6 (with DISTINCT)
+SELECT
+  COUNT(DISTINCT CASE WHEN fee = 50 THEN candidate_id END) AS full_fee_sum,
+  COUNT(DISTINCT CASE WHEN fee = 10 THEN candidate_id END) AS reduced_fee_sum
+FROM application;
+
+-- ## CASE WHEN with GROUP BY ##
+-- Example 1
+SELECT
+  course_id,
+  COUNT(CASE WHEN status= 'accepted' THEN 1 ELSE 0 END) AS accepted,
+  COUNT(CASE WHEN status= 'pending' THEN 1 ELSE 0 END) AS pending,
+  COUNT(CASE WHEN status= 'rejected' THEN 1 ELSE 0 END) AS rejected
+FROM application
+GROUP BY course_id
+ORDER BY course_id ASC;
+
+-- Example 2
+SELECT
+  candidate_id AS id,
+  COUNT(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) AS count_accepted,
+  COUNT(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) AS count_rejected,
+  COUNT(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS count_pending
+FROM application
+GROUP BY candidate_id
+ORDER BY candidate_id ASC;
+
+-- Example 3
+SELECT
+  course_id AS id,
+  COUNT(DISTINCT CASE WHEN preferred_contact = 'mobile' THEN candidate_id END) AS count_mobile,
+  COUNT(DISTINCT CASE WHEN preferred_contact = 'mail' THEN candidate_id END) AS count_mail
+FROM application
+JOIN course
+  ON application.course_id = course.id
+JOIN candidate
+  ON application.candidate_id = candidate.id
+GROUP BY course_id;
+
+-- Example 4
+SELECT
+  preferred_contact,
+  COUNT(id) AS candidates_count,
+  CASE WHEN COUNT(id) > 5 THEN 'high' ELSE 'low' END
+    AS rating
+FROM candidate
+GROUP BY preferred_contact;
+
+-- Example 5
+SELECT
+  CASE
+    WHEN score_language >= 70 THEN 'good score'
+    WHEN score_language >= 40 THEN 'average score'
+    ELSE 'poor score'
+  END,
+  COUNT(id)
+FROM candidate
+GROUP BY CASE
+    WHEN score_language >= 70 THEN 'good score'
+    WHEN score_language >= 40 THEN 'average score'
+    ELSE 'poor score'
+END;
