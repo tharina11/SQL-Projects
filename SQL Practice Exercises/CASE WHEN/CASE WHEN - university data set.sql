@@ -256,3 +256,94 @@ FROM course
 JOIN application
   ON course.id = application.course_id
 GROUP BY name, place_limit;
+
+-- # Final Quiz #
+-- Question 1
+SELECT
+  INITCAP(first_name) || ' ' || COALESCE(INITCAP(middle_name), '') || ' ' || UPPER(last_name) AS full_name
+FROM person
+WHERE length(last_name) >= 7
+
+-- Question 2
+SELECT
+  UPPER(SUBSTR(first_name, 1,1)) || COALESCE(UPPER(SUBSTR(middle_name, 1,1)), '') ||
+  UPPER(SUBSTR(last_name, 1,1)) || ' lives in ' || city || ' and weighs ' || 
+  CAST(ROUND(weight) AS varchar) || ' kilograms.' AS sentence
+FROM person
+JOIN branch
+  ON person.branch_id = branch.id;
+  
+-- Question 3
+SELECT
+  first_name,
+  last_name,
+  weight,
+  FLOOR(weight) AS weight_down,
+  CEILING(weight) AS weight_up
+FROM person;
+
+-- Question 4
+SELECT
+  branch.id,
+  country,
+  city,
+  ROUND(AVG(COALESCE(iq, 152)), 2) AS average_iq
+FROM branch
+JOIN person
+  ON branch.id = person.branch_id
+GROUP BY branch.id, country, city;
+
+-- Question 5
+SELECT
+  first_name,
+  last_name,
+  CURRENT_DATE - registration_date AS days
+FROM person
+WHERE registration_date < current_date - INTERVAL '3 month'
+;
+
+-- Question 6
+SELECT
+  DATE_PART('month', registration_date) AS month,
+  COUNT(id) AS people_no
+FROM person
+WHERE registration_date BETWEEN '2014-12-31' AND '2015-12-31'
+GROUP BY DATE_PART('month', registration_date);
+
+-- Question 7
+SELECT
+  first_name,
+  last_name,
+  CASE
+    WHEN iq < 149 THEN 'high'
+    WHEN iq BETWEEN 149 AND 152 THEN 'very high'
+    WHEN iq > 152 THEN 'highest'
+    WHEN iq IS NULL THEN 'missing'
+  END AS iq_rating
+FROM person
+JOIN branch
+  ON person.branch_id = branch.id;
+  
+-- Question 8
+SELECT
+  branch.id,
+  country,
+  city,
+  SUM(CASE WHEN iq = 156 THEN 1 ELSE 0 END) AS num_of_highest
+FROM person
+JOIN branch
+  ON person.branch_id = branch.id
+GROUP BY branch.id, country, city;
+
+-- Question 9
+SELECT
+  branch.id,
+  country,
+  city,
+  COUNT(CASE WHEN iq < 149 THEN person.id END) AS count_high,
+  COUNT(CASE WHEN iq BETWEEN 149 AND 152 THEN person.id END) AS count_very_high,
+  COUNT(CASE WHEN iq > 152 THEN person.id END) AS count_highest
+FROM person
+JOIN branch
+  ON person.branch_id = branch.id
+GROUP BY branch.id, country, city;
