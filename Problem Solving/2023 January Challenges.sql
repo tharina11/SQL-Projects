@@ -40,3 +40,14 @@ SELECT
   total_price,
   SUM(total_price) OVER(ORDER BY payment_date RANGE UNBOUNDED PRECEDING) AS running_total
   FROM booking;
+  
+-- Challenge 6
+SELECT
+  start_date,
+  max_capacity,
+  ROUND(AVG(max_capacity) OVER(ORDER BY start_date RANGE UNBOUNDED PRECEDING), 2) AS running_average
+FROM booking
+JOIN room
+ON booking.room_number = room.room_number
+JOIN room_type
+ON room.room_type_id = room_type.id;
